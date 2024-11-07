@@ -32,18 +32,18 @@ export class UsersController {
   // 사용자 조회 (GET /users/:id)
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.usersService.findOne(Number(id));
+    return this.usersService.findOne(id);
   }
 
   // 사용자 업데이트 (PUT /users/:id)
   @Put(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(Number(id), updateUserDto);
+    return this.usersService.update(id, updateUserDto);
   }
 
   // 사용자 삭제 (DELETE /users/:id)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.usersService.remove(Number(id));
+    return this.usersService.remove(id);
   }
 }

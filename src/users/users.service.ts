@@ -2,28 +2,36 @@ import { Injectable } from '@nestjs/common';
 // import { CreateUserDto } from './dto/create-user.dto';
 // import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto, UpdateUserDto } from './dto'; // index.ts 파일은 폴더의 대표 파일로 인식되기 때문에, import할 때 경로에서 index.ts를 생략할 수 있어서 편리함.
+import { InjectModel } from '@nestjs/mongoose';
+import { User } from './schemas/user.schema';
+import { Model, Types } from 'mongoose';
 
 // ===========================
 // Service: 비즈니스 로직을 처리하고 데이터를 다루는 역할
 // ===========================
 @Injectable()
 export class UsersService {
-  private users = [
-    { id: 1, name: 'Ahn', age: 31, email: 'Ahn@example.com' },
-    { id: 2, name: 'Lee', age: 31, email: 'Lee@example.com' },
-  ];
+  // @InjectModel() 데코레이터를 사용하여 User 모델을 주입
+  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
-  create(createUserDto: CreateUserDto) {
-    const newUsers = {
-      id: this.users.length > 0 ? this.users[this.users.length - 1].id + 1 : 1,
-      ...createUserDto,
-    };
+  // private users = [
+  //   { id: 1, name: 'Ahn', age: 31, email: 'Ahn@example.com' },
+  //   { id: 2, name: 'Lee', age: 31, email: 'Lee@example.com' },
+  // ];
+
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    // const newUsers = {
+    //   id: this.users.length > 0 ? this.users[this.users.length - 1].id + 1 : 1,
+    //   ...createUserDto,
+    // };
     // const newUsers = {
     //   id: this.users.length > 0 ? this.users[this.users.length - 1].id + 1 : 1,
     //   name: createUserDto.name,
     //   age: createUserDto.age,
     //   email: createUserDto.email,
     // };
+    // this.users.push(newUsers);
+    // return newUsers;
     /**
      * 전개 연산자 (Spread Operator)와 속성 지정 방식의 장단점
      *
@@ -44,46 +52,59 @@ export class UsersService {
      * 결론
      *   - 전개 연산자를 사용하는 것이 일반적으로 더 효율적이고 확장성이 뛰어난 방식임.
      */
-    this.users.push(newUsers);
-    return newUsers;
+    const createdUser = new this.userModel(createUserDto);
+    return await createdUser.save();
   }
 
-  findAll() {
-    return this.users;
+  async findAll(): Promise<User[]> {
+    // return this.users;
+    const users = await this.userModel.find().exec();
+    return users;
   }
 
-  findOne(id: number) {
-    return this.users.find((user) => user.id === id);
+  async findOne(id: string): Promise<User> {
+    // return this.users.find((user) => user.id === id);
+    const user = await this.userModel.findById(new Types.ObjectId(id)).exec();
+    return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    console.log('test');
-    const userIndex = this.users.findIndex((user) => user.id === id);
-    if (userIndex === -1) {
-      return null;
-    }
-    const updatedUser = { ...this.users[userIndex], ...updateUserDto };
-    /**
-     * 전개 연산자
-     *   - 두 객체의 속성명이 서로 다른 경우
-     *     - 병합됨
-     *   - 동일한 속성명이 있을 경우
-     *     - 뒤의 객체(obj2)가 앞의 객체(obj1)의 속성값을 덮어씀
-     */
-    this.users[userIndex] = updatedUser;
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    // const userIndex = this.users.findIndex((user) => user.id === id);
+    // if (userIndex === -1) {
+    //   return null;
+    // }
+    // const updatedUser = { ...this.users[userIndex], ...updateUserDto };
+    // /**
+    //  * 전개 연산자
+    //  *   - 두 객체의 속성명이 서로 다른 경우
+    //  *     - 병합됨
+    //  *   - 동일한 속성명이 있을 경우
+    //  *     - 뒤의 객체(obj2)가 앞의 객체(obj1)의 속성값을 덮어씀
+    //  */
+    // this.users[userIndex] = updatedUser;
+    // return updatedUser;
+    const updatedUser = await this.userModel
+      .findByIdAndUpdate(new Types.ObjectId(id), updateUserDto, {
+        new: true, // 새로운 값으로 업데이트된 문서 반환
+      })
+      .exec();
     return updatedUser;
   }
 
-  remove(id: number) {
-    const userIndex = this.users.findIndex((user) => user.id === id);
-    if (userIndex === -1) {
-      return null; // 사용자가 없으면 null 반환
-      // return; // 사용자가 없으면 undefined 반환
-    }
-    const deletedUser = this.users.splice(userIndex, 1); // splice() 메서드는 배열에서 요소를 삭제하는 동시에 삭제된 요소를 반환
-    console.log(deletedUser); // [{ id: 1, name: 'Ahn' }]
-    console.log(deletedUser[0]); // { id: 1, name: 'Ahn' }
-    console.log(this.users); // [{ id: 2, name: 'Lee' }]
-    return deletedUser[0]; // 삭제된 사용자
+  async remove(id: string): Promise<User> {
+    // const userIndex = this.users.findIndex((user) => user.id === id);
+    // if (userIndex === -1) {
+    //   return null; // 사용자가 없으면 null 반환
+    //   // return; // 사용자가 없으면 undefined 반환
+    // }
+    // const deletedUser = this.users.splice(userIndex, 1); // splice() 메서드는 배열에서 요소를 삭제하는 동시에 삭제된 요소를 반환
+    // console.log(deletedUser); // [{ id: 1, name: 'Ahn' }]
+    // console.log(deletedUser[0]); // { id: 1, name: 'Ahn' }
+    // console.log(this.users); // [{ id: 2, name: 'Lee' }]
+    // return deletedUser[0]; // 삭제된 사용자
+    const deletedUser = await this.userModel
+      .findByIdAndDelete(new Types.ObjectId(id))
+      .exec();
+    return deletedUser;
   }
 }
