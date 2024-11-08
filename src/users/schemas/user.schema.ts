@@ -14,6 +14,9 @@ export class User extends Document {
   @Prop()
   email: string;
 
+  @Prop()
+  password: string;
+
   @Prop({ default: Date.now })
   createdAt: Date;
 }

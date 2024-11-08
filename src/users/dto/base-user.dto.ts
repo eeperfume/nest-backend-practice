@@ -1,14 +1,17 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class BaseUserDto {
   @IsNotEmpty()
   name: string;
 
-  @IsNotEmpty()
-  age: number;
+  @IsOptional()
+  age?: number;
 
   @IsNotEmpty()
   email: string;
+
+  @IsNotEmpty()
+  password: string;
 }
 
 /**
