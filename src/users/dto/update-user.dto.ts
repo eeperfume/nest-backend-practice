@@ -60,7 +60,7 @@ export class UpdateUserDto extends PartialType(
    * }
    */
   @IsNotEmpty()
-  name: string;
+  username: string;
   /**
    * UpdateUserDto는 age와 email을 선택적으로 입력받고, name은 필수로 입력받습니다.
    *

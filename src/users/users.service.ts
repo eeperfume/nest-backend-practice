@@ -5,6 +5,8 @@ import { CreateUserDto, UpdateUserDto } from './dto'; // index.ts 파일은 폴�
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
 import { Model, Types } from 'mongoose';
+import * as bcrypt from 'bcrypt';
+import { ConfigService } from '@nestjs/config';
 
 // ===========================
 // Service: 비즈니스 로직을 처리하고 데이터를 다루는 역할
@@ -12,7 +14,10 @@ import { Model, Types } from 'mongoose';
 @Injectable()
 export class UsersService {
   // @InjectModel() 데코레이터를 사용하여 User 모델을 주입
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<User>,
+    private readonly configService: ConfigService,
+  ) {}
 
   // private users = [
   //   { id: 1, name: 'Ahn', age: 31, email: 'Ahn@example.com' },
@@ -52,7 +57,16 @@ export class UsersService {
      * 결론
      *   - 전개 연산자를 사용하는 것이 일반적으로 더 효율적이고 확장성이 뛰어난 방식임.
      */
-    const createdUser = new this.userModel(createUserDto);
+    const pepper = this.configService.get<string>('PEPPER'); // 환경 변수에서 pepper 조회
+    const saltedPassword = createUserDto.password + pepper; // pepper 추가
+    const hashedPassword = await bcrypt.hash(saltedPassword, 10); // 패스워드 해싱
+
+    // 입력받은 createUserDto 데이터에 해시된 패스워드 적용
+    const createdUser = new this.userModel({
+      ...createUserDto,
+      password: hashedPassword,
+    });
+
     return await createdUser.save();
   }
 

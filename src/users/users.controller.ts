@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto, UpdateUserDto } from './dto';
+import { User } from './schemas/user.schema';
 
 // ===========================
 // Controller: HTTP 요청을 처리하는 역할
@@ -19,31 +20,34 @@ export class UsersController {
 
   // 사용자 생성 (POST /users)
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
+  create(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.usersService.create(createUserDto);
   }
 
   // 모든 사용자 조회 (GET /users)
   @Get()
-  findAll() {
+  findAll(): Promise<User[]> {
     return this.usersService.findAll();
   }
 
   // 사용자 조회 (GET /users/:id)
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: string): Promise<User> {
     return this.usersService.findOne(id);
   }
 
   // 사용자 업데이트 (PUT /users/:id)
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<User> {
     return this.usersService.update(id, updateUserDto);
   }
 
   // 사용자 삭제 (DELETE /users/:id)
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: string): Promise<User> {
     return this.usersService.remove(id);
   }
 }

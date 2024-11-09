@@ -2,7 +2,7 @@ import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class BaseUserDto {
   @IsNotEmpty()
-  name: string;
+  username: string;
 
   @IsOptional()
   age?: number;

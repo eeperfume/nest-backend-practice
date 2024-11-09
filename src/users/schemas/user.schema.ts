@@ -4,9 +4,14 @@ import { Document } from 'mongoose';
 // 1. @Schema() 데코레이터로 MongoDB 스키마를 정의
 @Schema({ versionKey: false }) // versionKey 옵션을 false로 설정하여 __v 제거
 export class User extends Document {
+  /**
+   * User 클래스와 Mongoose의 Document 타입을 결합
+   * Document 타입을 추가해야 이를 통해 Mongoose의 메서드(save, update 등)을 사용할 때 타입 안정성을 보장함.
+   * 즉, 안전하게 사용할 수가 있음.
+   */
   // 2. @Prop() 데코레이터로 각 속성 정의
   @Prop({ required: true })
-  name: string;
+  username: string;
 
   @Prop()
   age: number;
