@@ -15,8 +15,8 @@ import { ConfigService } from '@nestjs/config';
 export class UsersService {
   // @InjectModel() 데코레이터를 사용하여 User 모델을 주입
   constructor(
-    @InjectModel(User.name) private userModel: Model<User>,
-    private readonly configService: ConfigService,
+    @InjectModel(User.name) private userModel: Model<User>, // Mongoose 모델
+    private readonly configService: ConfigService, // 일반 서비스: 애플리케이션 로직을 처리하는 일반적인 클래스 서비스
   ) {}
 
   // private users = [
@@ -79,6 +79,11 @@ export class UsersService {
   async findOne(id: string): Promise<User> {
     // return this.users.find((user) => user.id === id);
     const user = await this.userModel.findById(new Types.ObjectId(id)).exec();
+    return user;
+  }
+
+  async findOneByUsername(username: string): Promise<User | null> {
+    const user = await this.userModel.findOne({ username: username }).exec();
     return user;
   }
 

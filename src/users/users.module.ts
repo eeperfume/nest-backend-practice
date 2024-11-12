@@ -15,7 +15,7 @@ import { User, UserSchema } from './schemas/user.schema';
   ], // 다른 모듈이 필요하면 여기서 import
   providers: [UsersService], // 비즈니스 로직을 처리하는 Service 등록
   controllers: [UsersController], // 클라이언트 요청을 처리하는 Controller 등록
-  exports: [], // 다른 모듈에서 사용할 수 있도록 export
+  exports: [UsersService], // 다른 모듈에서 사용할 수 있도록 export
 })
 export class UsersModule {}
 
